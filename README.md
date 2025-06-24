@@ -10,6 +10,9 @@ A powerful frontend project scaffolding CLI tool that helps you quickly create n
 - 🔧 **Auto Configuration**: Automatically update package.json and initialize Git repository
 - 💾 **Smart Caching**: Efficient template caching to avoid repeated downloads
 - 📤 **Configuration Export/Import**: Export and import configuration for backup and sharing
+- 🧩 **Modular Design**: Clean code structure, easy to maintain and extend
+- 🛡️ **Robust Cache & Cleanup**: Multiple retries and process timeouts, cross-platform compatibility
+- ⚡ **Minimal Dependencies**: No redundant dependencies, fast startup, small binary size
 
 ## Installation
 
@@ -19,27 +22,27 @@ cargo install --path .
 
 ## Usage
 
-Commands Struct
+Command structure:
 
 ```text
 mammoth-cli
-├── new                    # 创建项目
-├── clean                  # 清理配置和缓存
-├── info                   # 显示配置信息
-├── template               # 模板管理
-│   ├── list              # 列出模板
-│   ├── add               # 添加模板
-│   ├── remove            # 删除模板
-│   ├── download          # 下载模板
-│   └── download-all      # 下载所有模板
-├── repo                   # 仓库管理
-│   ├── list              # 列出仓库
-│   ├── add               # 添加仓库
-│   └── remove            # 删除仓库
-└── config                 # 配置管理
-    ├── export            # 导出配置
-    ├── import            # 导入配置
-    └── validate          # 验证配置
+├── new                    # Create project (top-level command)
+├── clean                  # Clean config and cache (top-level command)
+├── info                   # Show config info (top-level command)
+├── template               # Template management (subcommand)
+│   ├── list              # List templates
+│   ├── add               # Add template
+│   ├── remove            # Remove template
+│   ├── download          # Download template
+│   └── download-all      # Download all templates
+├── repo                   # Repository management (subcommand)
+│   ├── list              # List repositories
+│   ├── add               # Add repository
+│   └── remove            # Remove repository
+└── config                 # Config management (subcommand)
+    ├── export            # Export config
+    ├── import            # Import config
+    └── validate          # Validate config
 ```
 
 ### Basic Commands
@@ -133,12 +136,13 @@ mammoth-cli config validate config-backup.json
 ## Configuration
 
 The CLI stores configuration in:
+
 - **Config**: `~/.config/mammoth-cli/templates.json` (Linux/macOS) or `%APPDATA%\mammoth-cli\templates.json` (Windows)
 - **Cache**: `~/.cache/mammoth-cli/templates/` (Linux/macOS) or `%LOCALAPPDATA%\mammoth-cli\templates\` (Windows)
 
 ### Configuration Format
 
-> Get [example.config.json](./example.config.json)
+> See [example.config.json](./example.config.json)
 
 The configuration file uses JSON format:
 
@@ -174,10 +178,30 @@ The configuration file uses JSON format:
 ```text
 mammoth-cli/
 ├── src/
-│   └── main.rs          # Main CLI application
-├── Cargo.toml           # Project dependencies
-└── README.md           # This file
+│   ├── main.rs      # Entry, command dispatch
+│   ├── cli.rs       # CLI argument and subcommand definitions
+│   ├── config.rs    # Config structure and management
+│   ├── manager.rs   # Template & repository management core logic
+│   ├── project.rs   # Project creation and initialization
+│   ├── utils.rs     # Utility functions
+│   └── lib.rs       # Common library (if any)
+├── Cargo.toml
+└── README.md
 ```
+
+## Dependencies
+
+| 依赖 | 版本 | 功能简述 |
+|------|------|----------|
+| `clap` | 4.0 | CLI参数解析和命令行界面框架，支持derive宏 |
+| `anyhow` | 1.0 | 错误处理库，提供简洁的错误类型和传播 |
+| `serde` | 1.0 | 序列化和反序列化框架，支持derive宏 |
+| `serde_json` | 1.0 | JSON序列化和反序列化实现 |
+| `tokio` | 1.0 | 异步运行时，提供完整的异步功能支持 |
+| `colored` | 2.0 | 终端文本颜色和样式控制 |
+| `dialoguer` | 0.11 | 交互式命令行提示和输入库 |
+| `indicatif` | 0.17 | 进度条和加载动画显示 |
+| `dirs` | 5.0 | 跨平台系统目录路径获取 |
 
 ## Development
 
@@ -198,21 +222,27 @@ cargo check
 cargo test
 ```
 
+## FAQ
+
+### Q: On Windows, sometimes cache/temp directories cannot be deleted?
+
+A: This may be caused by other processes (such as Explorer or antivirus software) occupying related files. Please close those programs and try again, or reboot and run the clean command.
+
 ## License
 
 [MIT License](./LICENSE)
 
-## 贡献
+## Contribution
 
-欢迎提交 Issue 和 Pull Request！
+Welcome to submit Issue and Pull Request!
 
-## 更新日志
+## Update Log
 
 ### v0.1.0
 
-- 初始版本
-- 远程模板支持
-- 模板缓存机制
-- 完整的模板管理功能
-- 交互式项目创建向导
-- 配置导入/导出功能
+- Initial version
+- Remote template support
+- Template cache mechanism
+- Complete template management functionality
+- Interactive project creation wizard
+- Configuration import/export functionality
