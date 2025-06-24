@@ -1,4 +1,4 @@
-# Mammoth CLI
+# 🦣 Mammoth CLI ❄️
 
 A powerful frontend project scaffolding CLI tool that helps you quickly create new projects from templates.
 
