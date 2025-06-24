@@ -17,7 +17,7 @@ A powerful frontend project scaffolding CLI tool that helps you quickly create n
 ## Installation
 
 ```bash
-cargo install --path .
+cargo install mammoth-cli
 ```
 
 ## Usage
