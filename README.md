@@ -173,7 +173,7 @@ The configuration file uses JSON format:
 }
 ```
 
-## 🔗[Develop Doc](./doc.md) ←
+## 🔗[Develop Doc](https://github.com/Mulander-J/mammoth-cli/blob/main/doc.md) ←
 
 ## ❓FAQ
 
@@ -183,7 +183,7 @@ A: This may be caused by other processes (such as Explorer or antivirus software
 
 ## License
 
-[MIT License](./LICENSE)
+MIT License
 
 ## Contribution
 
