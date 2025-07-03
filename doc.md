@@ -197,19 +197,39 @@ pub struct Template {
 
 #### 2. 仓库管理
 
-- **添加仓库**: 支持添加多个远程模板仓库
+- **添加仓库**: 支持添加多个远程模板仓库（包括私有仓库）
 - **删除仓库**: 移除不需要的仓库
 - **稀疏检出**: 使用 Git sparse-checkout 只下载需要的模板文件
+- **私有仓库支持**: 支持通过用户名和认证令牌访问私有仓库
 
 ```rust
 // 仓库数据结构
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Repo {
-    pub name: String,     // 仓库名称
-    pub url: String,      // Git 仓库 URL
-    pub branch: String,   // 分支名称
+    pub name: String,         // 仓库名称
+    pub url: String,          // Git 仓库 URL
+    pub branch: String,       // 分支名称
+    pub auth_token: Option<String>,  // 私有仓库认证令牌
+    pub username: Option<String>,    // 私有仓库用户名
 }
 ```
+
+**私有仓库配置示例**:
+
+```bash
+# 添加私有仓库
+mammoth-cli repo add private-templates \
+  --url https://github.com/your-org/private-templates \
+  --branch main \
+  --username your-username \
+  --auth-token your-personal-access-token
+```
+
+**支持的认证方式**:
+
+- **HTTPS + 个人访问令牌**: 用于 GitHub/GitLab 私有仓库
+- **SSH 密钥**: 自动使用系统配置的 SSH 密钥 【更推荐🔥】
+- **HTTP 基本认证**: 支持用户名/密码组合
 
 #### 3. 项目创建
 
@@ -236,3 +256,4 @@ pub struct Repo {
 - [Tokio 异步运行时](https://tokio.rs/)
 - [Clap CLI 框架](https://clap.rs/)
 - [Git Sparse Checkout](https://git-scm.com/docs/git-sparse-checkout)
+- [cargo-generate](https://github.com/cargo-generate/cargo-generate)

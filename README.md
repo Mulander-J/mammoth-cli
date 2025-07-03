@@ -148,28 +148,35 @@ The configuration file uses JSON format:
 
 ```json
 {
-  "repos": [
-    {
-      "name": "aio-templates",
-      "url": "https://github.com/Mulander-J/aio-templates",
-      "branch": "main"
-    }
-  ],
-  "templates": [
-    {
-      "id": "nuxt-shadcn",
-      "name": "Nuxt Shadcn Starter",
-      "repo": "aio-templates",
-      "path": "vue/nuxt-shadcn",
-      "description": "Nuxt Shadcn with Tailwind",
-      "language": "vue",
-      "tags": [
-        "nuxt",
-        "shadcn",
-        "tailwind"
-      ]
-    }
-  ]
+    "repos": [
+        {
+            "name": "public-templates",
+            "url": "https://github.com/your-org/public-templates",
+            "branch": "main"
+        },
+        {
+            "name": "private-templates",
+            "url": "https://github.com/your-org/private-templates",
+            "branch": "main",
+            "username": "your-username",
+            "auth_token": "your-personal-access-token"
+        }
+    ],
+    "templates": [
+        {
+            "id": "nuxt-shadcn",
+            "name": "Nuxt Shadcn Starter",
+            "repo": "public-templates",
+            "path": "vue/nuxt-shadcn",
+            "description": "Nuxt Shadcn with Tailwind",
+            "language": "vue",
+            "tags": [
+                "nuxt",
+                "shadcn",
+                "tailwind"
+            ]
+        }
+    ]
 }
 ```
 
@@ -188,14 +195,3 @@ MIT License
 ## Contribution
 
 Welcome to submit Issue and Pull Request!
-
-## Update Log
-
-### v0.1.0
-
-- Initial version
-- Remote template support
-- Template cache mechanism
-- Complete template management functionality
-- Interactive project creation wizard
-- Configuration import/export functionality

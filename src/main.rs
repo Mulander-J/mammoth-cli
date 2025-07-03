@@ -68,8 +68,10 @@ async fn main() -> Result<()> {
                 repo_name,
                 url,
                 branch,
+                username,
+                auth_token,
             } => {
-                manager.add_repo(repo_name.clone(), url.clone(), branch.clone())?;
+                manager.add_repo(repo_name.clone(), url.clone(), branch.clone(), username.clone(), auth_token.clone())?;
             }
             RepoCommands::Remove { repo_name } => {
                 manager.remove_repo(repo_name)?;

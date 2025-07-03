@@ -5,6 +5,12 @@ pub struct Repo {
     pub name: String,
     pub url: String,
     pub branch: String,
+    /// Optional authentication token for private repositories
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auth_token: Option<String>,
+    /// Optional username for private repositories
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub username: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -31,4 +37,4 @@ pub struct ProjectConfig {
     pub description: String,
     pub output_dir: String,
     pub template: Template,
-} 
+}

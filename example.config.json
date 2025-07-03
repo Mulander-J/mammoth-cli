@@ -1,16 +1,23 @@
 {
     "repos": [
         {
-            "name": "aio-templates",
-            "url": "https://github.com/Mulander-J/aio-templates",
+            "name": "public-templates",
+            "url": "https://github.com/your-org/public-templates",
             "branch": "main"
+        },
+        {
+            "name": "private-templates",
+            "url": "https://github.com/your-org/private-templates",
+            "branch": "main",
+            "username": "your-username",
+            "auth_token": "your-personal-access-token"
         }
     ],
     "templates": [
         {
             "id": "nuxt-shadcn",
             "name": "Nuxt Shadcn Starter",
-            "repo": "aio-templates",
+            "repo": "public-templates",
             "path": "vue/nuxt-shadcn",
             "description": "Nuxt Shadcn with Tailwind",
             "language": "vue",

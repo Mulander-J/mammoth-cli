@@ -135,6 +135,14 @@ pub enum RepoCommands {
         /// Branch
         #[arg(short, long, default_value = "main")]
         branch: String,
+        
+        /// Username for private repository authentication
+        #[arg(long)]
+        username: Option<String>,
+        
+        /// Authentication token for private repository
+        #[arg(long)]
+        auth_token: Option<String>,
     },
     /// Remove a repository
     Remove {

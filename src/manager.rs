@@ -129,29 +129,59 @@ impl TemplateManager {
         pb.set_message("Cloning repository...");
         pb.inc(30);
         
+        // Prepare git clone command with authentication if needed
+        let mut clone_cmd = tokio::process::Command::new("git");
+        clone_cmd.args([
+            "clone",
+            "--no-checkout",
+            "--filter=blob:none",
+            "--sparse",
+        ]);
+        
+        // Add authentication if provided
+        if let (Some(username), Some(token)) = (&repo.username, &repo.auth_token) {
+            // For HTTPS URLs, embed credentials in the URL
+            let auth_url = if repo.url.starts_with("https://") {
+                format!("https://{}:{}@{}", username, token, &repo.url[8..])
+            } else if repo.url.starts_with("http://") {
+                format!("http://{}:{}@{}", username, token, &repo.url[7..])
+            } else {
+                // For SSH URLs, we can't embed credentials, so we'll rely on SSH keys
+                repo.url.clone()
+            };
+            clone_cmd.arg(&auth_url);
+        } else {
+            clone_cmd.arg(&repo.url);
+        }
+        
+        clone_cmd.arg(&*temp_dir.to_string_lossy());
+        
         let clone_result = tokio::time::timeout(
             std::time::Duration::from_secs(300), // 5分钟超时
-            tokio::process::Command::new("git")
-                .args([
-                    "clone",
-                    "--no-checkout",
-                    "--filter=blob:none",
-                    "--sparse",
-                    &repo.url,
-                    &temp_dir.to_string_lossy(),
-                ])
-                .status(),
+            clone_cmd.status(),
         )
         .await;
         
         let status = match clone_result {
             Ok(Ok(status)) => status,
-            Ok(Err(e)) => anyhow::bail!("Failed to clone repository: {}", e),
+            Ok(Err(e)) => {
+                let error_msg = if repo.auth_token.is_some() {
+                    format!("Failed to clone private repository: {}. Please check your authentication credentials.", e)
+                } else {
+                    format!("Failed to clone repository: {}", e)
+                };
+                anyhow::bail!(error_msg);
+            },
             Err(_) => anyhow::bail!("Git clone timed out after 5 minutes"),
         };
         
         if !status.success() {
-            anyhow::bail!("Failed to clone repository: {}", repo.url);
+            let error_msg = if repo.auth_token.is_some() {
+                format!("Failed to clone private repository: {}. Please check your authentication credentials.", repo.url)
+            } else {
+                format!("Failed to clone repository: {}", repo.url)
+            };
+            anyhow::bail!(error_msg);
         }
         
         // Set sparse checkout directory
@@ -403,13 +433,19 @@ impl TemplateManager {
         Ok(())
     }
     
-    pub fn add_repo(&mut self, name: String, url: String, branch: String) -> Result<()> {
+    pub fn add_repo(&mut self, name: String, url: String, branch: String, username: Option<String>, auth_token: Option<String>) -> Result<()> {
         // Check if repository already exists
         if self.config.repos.iter().any(|r| r.name == name) {
             anyhow::bail!("Repository '{}' already exists", name);
         }
         
-        let repo = Repo { name, url, branch };
+        let repo = Repo { 
+            name, 
+            url, 
+            branch, 
+            auth_token, 
+            username 
+        };
         self.config.repos.push(repo);
         self.save_config()?;
         
@@ -462,8 +498,16 @@ impl TemplateManager {
             return;
         }
         for repo in &self.config.repos {
-            println!("{} - {}", repo.name.bold(), repo.url);
+            let auth_status = if repo.auth_token.is_some() {
+                "🔐 Private".green()
+            } else {
+                "🌐 Public".blue()
+            };
+            println!("{} - {} ({})", repo.name.bold(), repo.url, auth_status);
             println!("   🪐Branch: {}", repo.branch);
+            if let Some(username) = &repo.username {
+                println!("   👤Username: {}", username);
+            }
             println!();
         }
     }
@@ -747,8 +791,16 @@ impl TemplateManager {
                 println!("  No repositories configured");
             } else {
                 for repo in &self.config.repos {
-                    println!("  {} - {}", repo.name.bold(), repo.url);
+                    let auth_status = if repo.auth_token.is_some() {
+                        "🔐 Private".green()
+                    } else {
+                        "🌐 Public".blue()
+                    };
+                    println!("  {} - {} ({})", repo.name.bold(), repo.url, auth_status);
                     println!("    Branch: {}", repo.branch);
+                    if let Some(username) = &repo.username {
+                        println!("    Username: {}", username);
+                    }
                 }
             }
             println!();
